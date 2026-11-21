@@ -23,8 +23,13 @@ class IRMetrics:
             if q_id not in qrels:
                 continue
             
-            # YOUR CODE HERE: Calculate recall for this query
-            
+            correct_in_topk = sum(1 for doc_id in results[q_id][:k] if qrels[q_id].get(doc_id))
+            qrel_doc_count = len(qrels[q_id])
+            recall_scores.append(
+                correct_in_topk / qrel_doc_count 
+                if qrel_doc_count > 0 else 0.0
+            )
+
         return np.mean(recall_scores) if recall_scores else 0.0
 
     @staticmethod
@@ -37,8 +42,11 @@ class IRMetrics:
             if q_id not in qrels:
                 continue
             
-            # YOUR CODE HERE: Calculate precision for this query
-
+            correct_in_topk = sum(1 for doc_id in results[q_id][:k] if qrels[q_id].get(doc_id))
+            precision_scores.append(
+                correct_in_topk / k 
+                if k else 0
+            )
             
         return np.mean(precision_scores) if precision_scores else 0.0
 
@@ -52,8 +60,12 @@ class IRMetrics:
             if q_id not in qrels:
                 continue
             
-            # YOUR CODE HERE: Calculate MRR for this query
-
+            rr = 0
+            for idx, doc_id in enumerate(results[q_id]):
+                if qrels[q_id].get(doc_id):
+                    rr = 1 / (idx + 1)
+                    reciprocal_ranks.append(rr)
+                    break
             
         return np.mean(reciprocal_ranks) if reciprocal_ranks else 0.0
 
